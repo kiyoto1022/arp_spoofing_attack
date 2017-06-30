@@ -1,4 +1,4 @@
-void find_ethernet_address(char *interface_name, char *ethernet_address) {
+void find_ethernet_address(char *interface_name, u_char *ethernet_address) {
 
 	const char *ETHERNET_ADDRESS_FORMAT = "%02x:%02x:%02x:%02x:%02x:%02x"; 
 
