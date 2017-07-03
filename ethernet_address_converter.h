@@ -1,0 +1,1 @@
+int convert_ethernet_address_to_hexadecimal(const char *ethernet_address);

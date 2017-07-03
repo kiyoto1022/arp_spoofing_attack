@@ -16,3 +16,5 @@ struct arp_header
 	u_char destination_hardware_address[ETH_ALEN];
 	u_char destination_protocol_address[IP_ALEN];
 };
+
+void assign_arp_request(u_char *packet, char *interface_name, u_char *ip_destination);

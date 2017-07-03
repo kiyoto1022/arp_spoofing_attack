@@ -1,4 +1,13 @@
-void find_ethernet_address(char *interface_name, u_char *ethernet_address) {
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <netinet/in.h>
+#include <net/if.h>
+#include "find_ethernet_address.h"
+
+void find_ethernet_address(const char *interface_name, u_char *ethernet_address) {
 
 	const char *ETHERNET_ADDRESS_FORMAT = "%02x:%02x:%02x:%02x:%02x:%02x"; 
 
@@ -10,7 +19,6 @@ void find_ethernet_address(char *interface_name, u_char *ethernet_address) {
 	
 	fd = socket(AF_INET, SOCK_DGRAM, 0);
 	ioctl(fd, SIOCGIFHWADDR, &ifr);
-	close(fd);
 	
 	sprintf(ethernet_address, ETHERNET_ADDRESS_FORMAT,
 			ifr.ifr_hwaddr.sa_data[0] & 0xff,
