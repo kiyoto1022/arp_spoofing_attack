@@ -25,16 +25,16 @@ static u_char *byte_order(const u_char *hexadecimal) {
 		little_endian[j] = hexadecimal[i];
 	}
 
-    printf("Byte order is Little endian [%x:%x:%x:%x:%x:%x] \n",
-    		little_endian[0], little_endian[1], little_endian[2],
-    		little_endian[3], little_endian[4], little_endian[5]);
+	printf("Byte order is Little endian [%x:%x:%x:%x:%x:%x] \n",
+			ittle_endian[0], little_endian[1], little_endian[2],
+			little_endian[3], little_endian[4], little_endian[5]);
 
 	return little_endian;
 
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    printf("Byte order is Big endian [%x:%x:%x:%x:%x:%x] \n",
-    		hexadecimal[0], hexadecimal[1], hexadecimal[2],
-    		hexadecimal[3], hexadecimal[4], hexadecimal[5]);
+	printf("Byte order is Big endian [%x:%x:%x:%x:%x:%x] \n",
+			hexadecimal[0], hexadecimal[1], hexadecimal[2],
+			hexadecimal[3], hexadecimal[4], hexadecimal[5]);
 
 	return hexadecimal;
 
@@ -42,14 +42,14 @@ static u_char *byte_order(const u_char *hexadecimal) {
 }
 
 u_char *convert_ethernet_address_to_hexadecimal(const char *ethernet_address) {
-    u_char hexadecimal[ETHERNET_ADDRESS_LENGTH];
-    for(int i=0; i<ETHERNET_ADDRESS_LENGTH; i++) {
-    	hexadecimal[i] = (u_char)get_hexadecimal(ethernet_address[i*3], ethernet_address[i*3+1]); 
-    }
+	u_char hexadecimal[ETHERNET_ADDRESS_LENGTH];
+	for(int i=0; i<ETHERNET_ADDRESS_LENGTH; i++) {
+		hexadecimal[i] = (u_char)get_hexadecimal(ethernet_address[i*3], ethernet_address[i*3+1]); 
+	}
 
-    printf("Convert to %x:%x:%x:%x:%x:%x\n",
-    		hexadecimal[0], hexadecimal[1], hexadecimal[2],
-    		hexadecimal[3], hexadecimal[4], hexadecimal[5]);
+	printf("Convert to %x:%x:%x:%x:%x:%x\n",
+			hexadecimal[0], hexadecimal[1], hexadecimal[2],
+			hexadecimal[3], hexadecimal[4], hexadecimal[5]);
 
-    return byte_order(hexadecimal);
+	return byte_order(hexadecimal);
 }
