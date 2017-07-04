@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <sys/types.h>
 #include "ethernet_address_converter.h"
 
 static long int convert_str_to_hexadecimal(const char hex_code) {
