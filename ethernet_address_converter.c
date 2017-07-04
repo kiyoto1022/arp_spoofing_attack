@@ -27,7 +27,7 @@ static u_char *byte_order(const u_char *hexadecimal) {
 	}
 
 	printf("Byte order is Little endian [%x:%x:%x:%x:%x:%x] \n",
-			ittle_endian[0], little_endian[1], little_endian[2],
+			little_endian[0], little_endian[1], little_endian[2],
 			little_endian[3], little_endian[4], little_endian[5]);
 
 	return little_endian;
