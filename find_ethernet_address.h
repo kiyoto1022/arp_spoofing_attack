@@ -1,3 +1,5 @@
 #include <sys/types.h>
 
-void find_ethernet_address(const char *interface_name, u_char *ethernet_address);
+#define ETHERNET_ADDRESS_LENGTH 6
+
+u_char *find_ethernet_address(char *interface_name);

@@ -38,7 +38,6 @@ static u_char *byte_order(const u_char *hexadecimal) {
 			hexadecimal[3], hexadecimal[4], hexadecimal[5]);
 
 	return hexadecimal;
-
 #endif
 }
 

@@ -7,26 +7,25 @@
 #include <net/if.h>
 #include "find_ethernet_address.h"
 
-void find_ethernet_address(const char *interface_name, u_char *ethernet_address) {
-
-	const char *ETHERNET_ADDRESS_FORMAT = "%02x:%02x:%02x:%02x:%02x:%02x"; 
+u_char *find_ethernet_address(char *interface_name) {
 
 	int fd;
 	struct ifreq ifr;
 	
 	ifr.ifr_addr.sa_family = AF_INET;
-	strncpy(ifr.ifr_name, interface_name, sizeof(interface_name));
+	strncpy(ifr.ifr_name, interface_name, sizeof(ifr.ifr_name));
 	
 	fd = socket(AF_INET, SOCK_DGRAM, 0);
 	ioctl(fd, SIOCGIFHWADDR, &ifr);
+
+	static u_char ethernet_address[ETHERNET_ADDRESS_LENGTH];
 	
-	sprintf(ethernet_address, ETHERNET_ADDRESS_FORMAT,
-			ifr.ifr_hwaddr.sa_data[0] & 0xff,
-			ifr.ifr_hwaddr.sa_data[1] & 0xff,
-			ifr.ifr_hwaddr.sa_data[2] & 0xff,
-			ifr.ifr_hwaddr.sa_data[3] & 0xff,
-			ifr.ifr_hwaddr.sa_data[4] & 0xff,
-			ifr.ifr_hwaddr.sa_data[5] & 0xff);
-	
-	printf("The Ethernet address of the %s is %s\n", interface_name, ethernet_address);
+	for (int i=0; i<ETHERNET_ADDRESS_LENGTH; i++) {
+		ethernet_address[i] = ifr.ifr_hwaddr.sa_data[i] & 0xff;
+	}
+
+	printf("The Ethernet address of the %s is %x:%x:%x:%x:%x:%x\n", interface_name,
+			ethernet_address[0], ethernet_address[1], ethernet_address[2],
+			ethernet_address[3], ethernet_address[4], ethernet_address[5]);
+	return ethernet_address;
 }
