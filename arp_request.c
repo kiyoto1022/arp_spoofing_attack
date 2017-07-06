@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <net/ethernet.h> // ETH_ALEN, ETH_P_ARP, ETHERTHYPE_ARP
+#include <string.h> // for memcpy
+#include <arpa/inet.h> // for htons
 #include "arp_request.h"
 #include "ethernet_address_converter.h"
 
