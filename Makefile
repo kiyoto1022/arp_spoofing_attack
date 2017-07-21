@@ -1,2 +1,2 @@
-arp_spoofing: *.c
-	gcc -o arp_spoofing *.c
+arp_spoofing: src/*.c
+	gcc -o arp_spoofing src/*.c
