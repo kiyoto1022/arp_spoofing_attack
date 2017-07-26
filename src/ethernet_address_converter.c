@@ -24,14 +24,14 @@ static u_char *byte_order(const u_char *hexadecimal) {
 		little_endian[j] = hexadecimal[i];
 	}
 
-	printf("Byte order is Little endian [%x:%x:%x:%x:%x:%x] \n",
+	printf("Byte order is Little endian [%02x:%02x:%02x:%02x:%02x:%02x] \n",
 			little_endian[0], little_endian[1], little_endian[2],
 			little_endian[3], little_endian[4], little_endian[5]);
 
 	return little_endian;
 
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	printf("Byte order is Big endian [%x:%x:%x:%x:%x:%x] \n",
+	printf("Byte order is Big endian [%02x:%02x:%02x:%02x:%02x:%02x] \n",
 			hexadecimal[0], hexadecimal[1], hexadecimal[2],
 			hexadecimal[3], hexadecimal[4], hexadecimal[5]);
 
@@ -45,7 +45,7 @@ u_char *convert_ethernet_address_to_hexadecimal(const char *ethernet_address) {
 		hexadecimal[i] = (u_char)get_hexadecimal(ethernet_address[i*3], ethernet_address[i*3+1]); 
 	}
 
-	printf("Convert to %x:%x:%x:%x:%x:%x\n",
+	printf("Convert to %02x:%02x:%02x:%02x:%02x:%02x\n",
 			hexadecimal[0], hexadecimal[1], hexadecimal[2],
 			hexadecimal[3], hexadecimal[4], hexadecimal[5]);
 

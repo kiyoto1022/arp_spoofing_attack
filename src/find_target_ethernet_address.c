@@ -37,7 +37,7 @@ static u_char *get_sender_ethernet_address(char *reply_packet) {
 		exit(1);
 	}
 
-	printf("Sender ethernet address of arpreply [%x:%x:%x:%x:%x:%x]\n",
+	printf("Sender ethernet address of arpreply [%02x:%02x:%02x:%02x:%02x:%02x]\n",
 		ethernet_header->source[0], ethernet_header->source[1], ethernet_header->source[2],
 		ethernet_header->source[3], ethernet_header->source[4], ethernet_header->source[5]);
 	return ethernet_header->source;

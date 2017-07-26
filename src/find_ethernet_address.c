@@ -24,7 +24,7 @@ u_char *find_ethernet_address(char *interface_name) {
 		ethernet_address[i] = ifr.ifr_hwaddr.sa_data[i] & 0xff;
 	}
 
-	printf("The Ethernet address of the %s is %x:%x:%x:%x:%x:%x\n", interface_name,
+	printf("The Ethernet address of the %s is %02x:%02x:%02x:%02x:%02x:%02x\n", interface_name,
 			ethernet_address[0], ethernet_address[1], ethernet_address[2],
 			ethernet_address[3], ethernet_address[4], ethernet_address[5]);
 	return ethernet_address;
