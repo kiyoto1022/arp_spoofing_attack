@@ -2,6 +2,10 @@
 
 Enjoy arp spoofing.
 
+## Requirement
+
+    # yum install libpcap-devel
+
 ## Compile
 
     $ make
