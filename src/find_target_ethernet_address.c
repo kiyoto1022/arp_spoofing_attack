@@ -2,9 +2,11 @@
 #include <sys/types.h>
 #include <arpa/inet.h> // for htons, inet_addr
 #include <stdlib.h> // for exit
-#include <string.h>
+#include <string.h> // for strncpy
+#include <unistd.h> // for read
 #include "find_ethernet_address.h"
 #include "arp_request.h"
+#include "header.h"
 #include "find_target_ethernet_address.h"
 
 static void send_arp_request(char *interface_name, u_char *my_ip_address, u_char *target_ip_address) {

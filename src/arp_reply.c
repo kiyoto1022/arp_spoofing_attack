@@ -2,8 +2,8 @@
 #include <net/ethernet.h> // ETH_ALEN, ETH_P_ARP, ETHERTHYPE_ARP
 #include <string.h> // for memcpy
 #include <arpa/inet.h> // for htons
-#include "arp_request.h"
 #include "arp_reply.h"
+#include "header.h"
 
 static void assign_ethernet_header(char *packet, u_char *own_eth_address, u_char *target_eth_address) {
 

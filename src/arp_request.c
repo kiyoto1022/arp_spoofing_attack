@@ -3,6 +3,7 @@
 #include <string.h> // for memcpy
 #include <arpa/inet.h> // for htons
 #include "arp_request.h"
+#include "header.h"
 #include "ethernet_address_converter.h"
 
 static void assign_ethernet_header(char *packet, u_char *eth_source) {

