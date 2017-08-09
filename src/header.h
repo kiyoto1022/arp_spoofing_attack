@@ -10,7 +10,9 @@
 struct spoofing_attack {
 	u_char target1_ethernet_address[ETH_ALEN];
 	u_char target2_ethernet_address[ETH_ALEN];
+	u_char man_in_the_middle_eth_address[ETH_ALEN];
 	char interface_name[10];
+	int send_socket;
 };
 
 struct ethernet_header {

