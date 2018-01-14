@@ -53,8 +53,8 @@ static u_char *receive_arp_reply() {
 		exit(1);
 	}
 	
-	static u_char reply_packet[sizeof(struct ethernet_header) + sizeof(struct arp_header)];
-	read(read_socket, reply_packet, get_arp_request_size());
+	static u_char arp_reply_packet[sizeof(struct ethernet_header) + sizeof(struct arp_header)];
+	read(read_socket, arp_reply_packet, get_arp_request_size());
 
 	return reply_packet;
 }
@@ -63,6 +63,6 @@ u_char *get_target_ethernet_address(char *interface_name, u_char *my_ip_address,
 
 	send_arp_request(interface_name, my_ip_address, target_ip_address);
 
-	u_char *reply_packet = receive_arp_reply(); // TODO: Change to polling
-	return get_sender_ethernet_address(reply_packet);
+	u_char *arp_reply_packet = receive_arp_reply(); // TODO: Change to polling
+	return get_sender_ethernet_address(arp_reply_packet);
 }

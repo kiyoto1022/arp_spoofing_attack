@@ -7,10 +7,10 @@
 #define ARPOP_REQUEST 1
 #define ARPOP_REPLY 2
 
-struct spoofing_attack {
+struct forward_struct {
 	u_char target1_ethernet_address[ETH_ALEN];
 	u_char target2_ethernet_address[ETH_ALEN];
-	u_char man_in_the_middle_eth_address[ETH_ALEN];
+	u_char attackers_ethernet_address[ETH_ALEN];
 	char interface_name[10];
 	int send_socket;
 };

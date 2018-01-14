@@ -1,6 +1,6 @@
-# arp_spoofing
+# arp_spoofing_attack
 
-Enjoy arp spoofing.
+Enjoy arp spoofing attack
 
 ## Requirement
 
@@ -12,4 +12,4 @@ Enjoy arp spoofing.
 
 ## Running
 
-    $ ./arp_spoofing
+    # ./arp_spoofing_attack eth0 192.168.1.1 192.168.1.10

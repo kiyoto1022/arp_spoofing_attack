@@ -8,64 +8,64 @@
 #include "header.h"
 #include "packet_forward.h"
 
-int count_tcp = 0;
-int count_udp = 0;
-int count_other = 0;
+int tcp_packet = 0;
+int udp_packet = 0;
+int other_packet = 0;
 
 static int get_packet_size(const u_char *packet) {
 	struct ip_header *ip_hdr = (struct ip_header*)(packet + 14);
 	return ntohs(ip_hdr->total_length);
 }
 
-static void change_ethernet_address(u_char *packet, struct spoofing_attack *spoofing_attack) {
+static void overwrite_ethernet_address(u_char *forgery_packet, struct forward_struct *forward_struct) {
 
-	struct ethernet_header *eth_header = (struct ethernet_header*)packet;
+	struct ethernet_header *eth_header = (struct ethernet_header*)forgery_packet;
 	
-	if (memcmp(spoofing_attack->target1_ethernet_address, eth_header->source, ETH_ALEN) == 0) {
-		memcpy(eth_header->source, spoofing_attack->man_in_the_middle_eth_address, ETH_ALEN);
-		memcpy(eth_header->destination, spoofing_attack->target2_ethernet_address, ETH_ALEN);
+	if (memcmp(forward_struct->target1_ethernet_address, eth_header->source, ETH_ALEN) == 0) {
+		memcpy(eth_header->source, forward_struct->attackers_ethernet_address, ETH_ALEN);
+		memcpy(eth_header->destination, forward_struct->target2_ethernet_address, ETH_ALEN);
 	}
 
-	if (memcmp(spoofing_attack->target2_ethernet_address, eth_header->source, ETH_ALEN) == 0) {
-		memcpy(eth_header->source, spoofing_attack->man_in_the_middle_eth_address, ETH_ALEN);
-		memcpy(eth_header->destination, spoofing_attack->target1_ethernet_address, ETH_ALEN);
+	if (memcmp(forward_struct->target2_ethernet_address, eth_header->source, ETH_ALEN) == 0) {
+		memcpy(eth_header->source, forward_struct->attackers_ethernet_address, ETH_ALEN);
+		memcpy(eth_header->destination, forward_struct->target1_ethernet_address, ETH_ALEN);
 	}
 }
 
-static void forwarding(u_char *packet, struct spoofing_attack *spoofing_attack) {
+static void forwarding(u_char *forgery_packet, struct forward_struct *forward_struct) {
 	
 	struct sockaddr sockaddr;
-	strncpy(sockaddr.sa_data, spoofing_attack->interface_name, sizeof(sockaddr.sa_data));
+	strncpy(sockaddr.sa_data, forward_struct->interface_name, sizeof(sockaddr.sa_data));
 
-	if(sendto(spoofing_attack->send_socket, packet, get_packet_size(packet), 0, &sockaddr, sizeof(sockaddr)) < 0) {
+	if(sendto(forward_struct->send_socket, forgery_packet, get_packet_size(forgery_packet), 0, &sockaddr, sizeof(sockaddr)) < 0) {
 		printf("\nFailed to send forwarding : %s\n", strerror(errno));
 		return;
 	}
 }
 
-static void packet_count(const u_char *packet) {
+static void countup(const u_char *packet) {
 
 	struct ip_header *ip_hdr = (struct ip_header*)(packet + 14);
 	switch(ip_hdr->protocol) {
-		case IPPROTO_TCP: count_tcp += 1; break;
-		case IPPROTO_UDP: count_udp += 1; break;
-		default: count_other += 1; break;
+		case IPPROTO_TCP: tcp_packet += 1; break;
+		case IPPROTO_UDP: udp_packet += 1; break;
+		default: other_packet += 1; break;
 	}
-	printf("\rTCP: %d Packet , UDP: %d Packet , OTHER: %d Packet", count_tcp, count_udp, count_other);
+	printf("\rTCP: %d Packet , UDP: %d Packet , OTHER: %d Packet", tcp_packet, udp_packet, other_packet);
 }
 
-void forward(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) {
+void forward_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) {
 
-	struct spoofing_attack *spoofing_attack = (struct spoofing_attack*)args;	
+	struct forward_struct *forward_struct = (struct forward_struct*)args;	
 
-	packet_count(packet);
+	countup(packet);
 
-	u_char fowarding_packet[get_packet_size(packet)];
-	memcpy(fowarding_packet, packet, get_packet_size(packet));
+	u_char forgery_packet[get_packet_size(packet)];
+	memcpy(forgery_packet, packet, get_packet_size(packet));
 
-	change_ethernet_address(fowarding_packet, spoofing_attack);
+	overwrite_ethernet_address(forgery_packet, forward_struct);
 
-	forwarding(fowarding_packet, spoofing_attack);
+	forwarding(forgery_packet, forward_struct);
 
 	// To avoid No buffer space available Error.
 	usleep(100);
